@@ -33,7 +33,6 @@ document.body.appendChild(renderer.domElement);
 //scene.add(new THREE.AxesHelper(5))
 
 // MAKE BLOCKS
-
 let blocks = [];
 
 let geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -64,7 +63,9 @@ let vertexShader = `
     void main() {
 			
         float a = edgeFactor(vUv);
-          
+
+       // Played around with this (c variable) to get the colors to look like
+       // the big galaxy in the space background.
         vec3 c = mix(vec3(0.166), vec3(0.199, t, 0.5), a);
           
         gl_FragColor = vec4(c, 1);
@@ -215,22 +216,7 @@ for (let n = 0; n < groups.length; n++) {
     pp._rotation = [pp.rotation.x, pp.rotation.y, pp.rotation.z];
 }
 
-// ANIMATE THE SCENE
-let animate = function () {
-    requestAnimationFrame(animate);
-
-    for (let n = 0; n < groups.length; n++) {
-        if (groups[n].animate) {
-            groups[n].animate();
-        }
-    }
-
-    //    puzzle.rotation.y += 0.005;
-    renderer.render(scene, camera);
-};
-animate();
-
-// Create DOM ELEMENTS
+// EVENT LISTENERS
 let nextBtn = document.getElementById("next");
 nextBtn.addEventListener("click", function (e) {
     step += 1;
@@ -275,7 +261,6 @@ jumbleBtn.addEventListener("click", function (e) {
     }, 1);
 });
 
-// EVENT LISTENERS
 document.addEventListener("mousewheel", function (e) {
     if (e.wheelDeltaY < 0) {
         camera.position.z += 1;
@@ -308,7 +293,7 @@ document.addEventListener("mousedown", (r) => {
     });
 });
 
-// ANIMATIONS
+// ANIMATION FUNCTIONS
 function clearAnimation() {
     this.animate = null;
 }
@@ -321,8 +306,8 @@ function transitionFn(duration){
         if (t >= (btime + duration)) return 0;
 
         let d = ((btime + duration) - t) / duration;
-        return -(Math.cos(Math.PI * d) - 1) / 2;
-        //return 1 - Math.cos((d * Math.PI) / 2);
+        return -(Math.cos(Math.PI * d) - 1) / 2; // Ease in out
+        //return 1 - Math.cos((d * Math.PI) / 2); // Ease in 
     }
 }
 
@@ -352,6 +337,17 @@ function jumbleAnimation(pp, coords, clear, transFn){
     }
 }
 
+// ANIMATE THE SCENE
+function animate() {
+    requestAnimationFrame(animate);
 
+    for (let n = 0; n < groups.length; n++) {
+        if (groups[n].animate) {
+            groups[n].animate();
+        }
+    }
 
-
+    //    puzzle.rotation.y += 0.005;
+    renderer.render(scene, camera);
+};
+animate();
